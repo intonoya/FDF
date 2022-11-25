@@ -6,33 +6,31 @@
 /*   By: intonoya <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 18:00:57 by intonoya          #+#    #+#             */
-/*   Updated: 2022/04/19 15:47:27 by intonoya         ###   ########.fr       */
+/*   Updated: 2022/11/08 16:11:48 by tumolabs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "libft.h"
 
 int	ft_atoi(const char *str)
 {
-	long	i;
-	long	nbr;
-	int		min;
+	int		i;
+	int		res;
+	int		neg;
 
 	i = 0;
-	min = 0;
-	nbr = 0;
-	while (str[i] != '\0' && (str[i] == 32 || str[i] == '\t' || str[i] == '\n'
-			|| str[i] == '\r' || str[i] == '\v' || str[i] == '\f'))
-			i++;
-	if (str[i] != '\0' && str[i] == '-')
+	while (str[i] == '\t' || str[i] == '\n' || str[i] == '\r' || str[i] == '\v'
+		|| str[i] == '\f' || str[i] == ' ')
+		i++;
+	neg = 1;
+	if (str[i] == '-')
+		neg = -1;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	res = 0;
+	while (str[i] >= 48 && str[i] <= 57)
 	{
-		min = 1;
+		res = res * 10 + str[i] - '0';
 		i++;
 	}
-	else if (str[i] == '+')
-		i++;
-	while (str[i] != '\0' && ft_isdigit(str[i]))
-		nbr = (nbr * 10) + (str[i++] - '0');
-	if (min == 1)
-		return (-nbr);
-	return (nbr);
-}	
+	return (res * neg);
+}

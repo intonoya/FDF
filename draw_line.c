@@ -6,89 +6,63 @@
 /*   By: intonoya <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 20:19:23 by intonoya          #+#    #+#             */
-/*   Updated: 2022/10/23 17:40:13 by intonoya         ###   ########.fr       */
+/*   Updated: 2022/11/16 20:17:32 by intonoya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "fdf.h"
-#include <math.h>
 
-int     mmax(float a, float b)
+void	my_pixel_put(t_fdf *util)
 {
-    return(a > b ? a : b);
+	char	*dst;
+
+	if (util->x > 0 && util->y > 0 && WIN_W > util->x && \
+		WIN_H > util->y)
+	{
+		dst = util->addr + ((int)util->y * util->size_line + \
+			(int)util->x * (util->bpp / 8));
+		*(unsigned int *)dst = util->pixel;
+	}
 }
 
-void    make_isometric(float *x, float *y, int z, double angle)
+void	color(t_fdf *util, int x, int y)
 {
-    *x = (*x - *y) * cos(angle);
-    *y = (*x + *y) * sin(angle) - z;
+	if (util->isom == 1 || util->isom == 0)
+	{
+		if (util->z_matrix[y][x] == 0 && util->color[y][x] == 0)
+			util->pixel = 0xFFE300;
+		else if (util->z_matrix[y][x] >= 0 && util->color[y][x] > 0)
+			util->pixel = util->color[y][x];
+		else if (util->z_matrix[y][x] > 0 && util->color[y][x] == 0)
+			util->pixel = 0xFF5403;
+		else
+			util->pixel = 0x125B50;
+	}
 }
 
-void    zoom1(float *x, float *y, float *x1, fdf *util)
+void	zoom(t_fdf *util)
 {
-    *x *= util->unitsize;
-    *y *= util->unitsize;
-    *x1 *= util->unitsize;
+	if (util->height < 100 && util->width < 100)
+		util->unitsize = 20;
+	else
+		util->unitsize = 10;
 }
 
-void    zoom2(float *y1, int *z, int *z1, fdf *util)
+void	menu(t_fdf *util)
 {
-    *y1 *= util->unitsize;
-    *z *= util->z_scale;
-    *z1 *= util->z_scale;
+	util->path = "./background.xpm";
+	util->img_ptr = mlx_xpm_file_to_image(util->mlx_ptr, util->path, \
+		&util->w, &util->h);
+	util->addr = mlx_get_data_addr(util->img_ptr, &util->bpp, \
+		&util->size_line, &util->endian);
 }
 
-void    draw_the_line(float x, float y, float x1, float y1, fdf *util)
+void	isometric(float *x, float *y, int z, t_fdf *util)
 {
+	float	prev_x;
+	float	prev_y;
 
-    float       x_step;
-    float       y_step;
-    int         max;
-    int         z;
-    int         z1;
-
-    z = util->z_matrix[(int)y][(int)x];
-    z1 = util->z_matrix[(int)y1][(int)x1];
-    zoom1(&x, &y, &x1, util); //zoom withunit size
-    zoom2(&y1, &z, &z1, util);//zoom with unit size
-    util->color = (z || z1) ? 0x4f039a : 0xffffff;//colour
-    make_isometric(&x, &y, z, util->angle);//the angle
-    make_isometric(&x1, &y1, z1, util->angle);//the angle
-    x += util->shiftx;
-    y += util->shifty;
-    x1 += util->shiftx;
-    y1 += util->shifty;
-    x_step = x1 - x;//calculate the steps(65 - 75)
-    y_step = y1 - y;
-    max = mmax(fabsf(x_step), fabsf(y_step));
-    x_step /= max;
-    y_step /= max;
-    while((int)(x - x1) || (int)(y - y1))
-    {
-        mlx_pixel_put(util->mlx_ptr, util->win_ptr, x, y, util->color);
-        x += x_step;
-        y += y_step;
-    }
+	prev_x = *x;
+	prev_y = *y;
+	*x = (prev_x - prev_y) * cos(util->angle);
+	*y = (prev_x + prev_y) * sin(util->angle) - z;
 }
-
-void    draw(fdf *util)
-{
-    int     i;
-    int     j;
-
-    i = 0;
-    while(i < util->height)
-    {
-        j = 0;
-        while(j < util->width)
-        {
-            if(j < util->width - 1)
-                draw_the_line(j, i, j + 1, i, util);
-            if(i < util->height - 1)
-                draw_the_line(j, i, j, i + 1, util);
-            j++;
-        }
-        i++;
-    }
-    mlx_string_put(util->mlx_ptr, util->win_ptr, 5, 5, 0x00FAFF, "Zoom In(+) Zoom Out(-) Up(up button) Down(down button) Right(right button) Left(left button))");
-    mlx_string_put(util->mlx_ptr, util->win_ptr, 5, 25, 0x00FAFF, "Angle P(4) Angle N(6) Scale P(8) Scale N(2)");
-}    

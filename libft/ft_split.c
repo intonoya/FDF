@@ -6,7 +6,7 @@
 /*   By: intonoya <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/30 16:10:52 by intonoya          #+#    #+#             */
-/*   Updated: 2022/04/14 13:45:20 by intonoya         ###   ########.fr       */
+/*   Updated: 2022/11/08 18:54:26 by tumolabs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "libft.h"
@@ -98,4 +98,4 @@ char	**ft_split(char const *s, char c)
 	}
 	tab_s[i] = 0;
 	return (tab_s);
-}	
+}
