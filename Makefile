@@ -6,7 +6,7 @@
 #    By: intonoya <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/04 16:45:54 by intonoya          #+#    #+#              #
-#    Updated: 2022/10/04 19:25:14 by intonoya         ###   ########.fr        #
+#    Updated: 2022/11/25 14:28:28 by intonoya         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,11 +18,11 @@ LIBFT			=	libft/libft.a
 
 OBJS			=	${SRC:.c=.o}
 
-MLX_FLAGS		=	-lmlx -framework OpenGL -framework AppKit -lm
+MLX_FLAGS		=	-lmlx -framework OpenGL -framework AppKit -lm -fsanitize=address -g
 
 CC				=	gcc
 
-CFLAGS			=	-Wall -Werror -Wextra
+CFLAGS			=	-Wall -Werror -Wextra -fsanitize=address -g
 
 .c.o			:
 					${CC} ${CFLAGS}  -c $< -o ${<:.c=.o}
